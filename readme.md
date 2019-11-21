@@ -1,6 +1,7 @@
 # Neural network for DNA sequences
 People
     - Lareina Liu (senior, stat)
+    - Zhaoyi (Kevin) Zhang (sophomore, CS+DS)
 
 # Steps to clone the repo locally
 
