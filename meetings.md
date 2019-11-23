@@ -1,14 +1,3 @@
-# To do
-- need to schedule a meeting with Lareina to setup project and expectations
-
-- Name
-- Project
-- Time
-- Outcomes
-- Meeting frequency
-- Specific tasks
-
-
 Rules of the game:
 - Need to study: https://github.com/crsl4/mindful-programming
 - Document everything you do clearly (in Rmd or jupyter notebooks)
@@ -16,3 +5,16 @@ Rules of the game:
 - Keep most updated version in github
 - Do not push data, PDF, images or big files to github
 - Feel free to email or schedule meetings ahead of time if problems arise, always better to ask questions sooner!
+
+# To do
+- initial meeting dna-nn:
+    - all in slack, github
+    - all read lecture.html, Chen2019
+    - general channel has dataset: understanding the data
+    - weekly meeting: wait for next semester
+    - future: cluster use
+
+
+
+
+

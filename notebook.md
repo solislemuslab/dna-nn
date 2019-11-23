@@ -25,3 +25,9 @@ Methods:
 - random forest
 - neural networks
 - ...
+
+### Previous work
+
+Claudia had fit naive neural networks and random forest in Julia. All scripts in `scripts/previous-work`:
+- `notebook.md`: explains pre-processing of the data
+- `*.jl`: julia scripts, described in `notebook.md`
