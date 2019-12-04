@@ -12,7 +12,7 @@ Rules of the game:
     - all read lecture.html, Chen2019
     - general channel has dataset: understanding the data
     - weekly meeting: wait for next semester
-    - future: cluster use
+    - future: cluster use, best accuracy for feb, how to choose best n, see problems in hamlet talk
 
 
 
