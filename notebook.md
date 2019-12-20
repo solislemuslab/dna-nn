@@ -26,6 +26,11 @@ Methods:
 - neural networks
 - ...
 
+### Main difficulties in this project
+- Input data are categories/letters: ACGT, cannot be treated as numbers 1234
+- There is correlation among rows and among columns. For example, every three letters in the genome corresponds to one "codon"
+- Biologists want to know how many individual bacteria they need to sequence to train the method with high prediction accuracy 
+
 ### Previous work
 
 Claudia had fit naive neural networks and random forest in Julia. All scripts in `scripts/previous-work`:
