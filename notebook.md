@@ -21,9 +21,11 @@ We have two datasets
             - carb: 79% false, 21% true; highly unbalanced, so we need to take this into account when we penalized wrong predictions. That is, a naive prediction predicting everything to be false will be ~79% accurate
             - toby: 95% false, 5% true
         - 261,868 variant columns out of the 483,333
+        - __~121__ different condons in total
     - Staphylococcus Matrix: 125 by 983,088; missingness rate 1.19% on average, 13.03% highest
         - One antibiotic (unnamed). The label vector is 17% true, 83% false
         - 496,218 variant columns out of 983,088
+        - __~104__ different condons in total
         - only one sequence contains 10 N nucleotides
 
 Ideas to encode the nucleotides ACGT:
@@ -34,6 +36,7 @@ Questions:
 - Complete the description of the data in terms of dimensions, missingness, balance of labels
 - How do we treat missingness? Do we try to impute?
 - Better to use only variant columns which reduces dimension by half approx, or to convert each codon (3 nucleotides) which reduces dimension by third?
+  - grouping nucleotides into condons seems to significantly reduce the number of features in both data sets
 
 Next steps:
 - Calculate distance matrix from both datasets (Pseudomonas 122 by 122; Staph 125 by 125). Distances are defined as differences in genome sequence
