@@ -21,11 +21,11 @@ We have two datasets
             - carb: 79% false, 21% true; highly unbalanced, so we need to take this into account when we penalized wrong predictions. That is, a naive prediction predicting everything to be false will be ~79% accurate
             - toby: 95% false, 5% true
         - 261,868 variant columns out of the 483,333
-        - __~121__ different condons in total
+        - __~125__ different condons in total
     - Staphylococcus Matrix: 125 by 983,088; missingness rate 1.19% on average, 13.03% highest
         - One antibiotic (unnamed). The label vector is 17% true, 83% false
         - 496,218 variant columns out of 983,088
-        - __~104__ different condons in total
+        - __~116__ different condons in total
         - only one sequence contains 10 N nucleotides
 
 Ideas to encode the nucleotides ACGT:
