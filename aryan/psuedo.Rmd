@@ -10,53 +10,56 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Read the dataframe from the files
 
-```{r read-data}
-x<-read.csv("responses-pseudo.csv")
-```
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-This script cleans up the NA values from pseudomonas
-
-```{r read staphylococcus}
-library(tidyr)
-summary(x)
-good<-complete.cases(x)
-pseudo<-x[good,]
-summary(pseudo)
-pseudo
-```
-
 ## Including Plots
+## plots above ratio in changes between the false and true values between carb and toby vals
 
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
-good<-complete.cases(x)
-pseudo<-x[good,]
+pseudo<-read.csv("responses-pseudo.csv")
+summary(pseudo)
+good<-complete.cases(pseudo)
+pseudo<-pseudo[good,]
 counter<-c(pseudo['carb'][])
-library(tidyverse)
-#pseudo$carb[pseudo$carb==TRUE])
-#hhist(pseudo$carb[pseudo$carb==FALSE])
+
+staph<-read.csv("responses-staph.csv")
+good<-complete.cases(staph)
+staph<-staph[good,]
+summary(staph)
+
 ```
+
+
 ```{r}
+library(tidyverse)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
-
-good<-complete.cases(x)
-pseudo<-x[good,]
+good<-complete.cases(pseudo)
+pseudo<-pseudo[good,]
+summary(pseudo)
 ```
 
 
 ```{r}
-ggplot(data = pseudo, aes(x=carb, y = as.numeric(carb), fill = LabID, width=0.5))+stat_summary(fun.y = sum, geom = "bar", fill="#FF9999")
-ggplot(data = pseudo, aes(x=toby, y = as.numeric(toby), fill = LabID, width=0.5))+stat_summary(fun.y = sum, geom = "bar",fill="yellow")
+ggplot(pseudo, aes(factor(carb))) + geom_bar(width = 0.5, fill="light blue", color= "red") + ggtitle("(A) Count of responses to carbenicillin (in pseudomonas)")
+ggplot(pseudo, aes(factor(toby))) + geom_bar(width = 0.5, fill="light blue", color= "red") + ggtitle("(B) Count of responses to tobramycin (in pseudomonas)")
+ggplot(staph, aes(factor(resp))) + geom_bar(width = 0.5, fill="light pink", color= "black") + ggtitle("(C) Count of responses (in Staphylococcus)")
 
 ```
 
+
+```{r}
+library(adegenet)
+dna <- fasta2DNAbin(file="concatenated.fasta")
+library(ape)
+D <- dist.dna(dna, model = "TN93")
+length(D)
+temp <- as.data.frame(as.matrix(D))
+table.paint(temp, cleg=0, clabel.row=.5, clabel.col=.5) #darker shades of gray mean a larger distance # you can also make cool color plots but they're much more complicated because they use the image() function
+tre3 <- as.phylo(hclust(D,method="average"))
+plot(tre3, cex=.5)
+title("UPGMA tree")
+```
 
 
