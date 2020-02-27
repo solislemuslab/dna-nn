@@ -14,7 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## plots above ratio in changes between the false and true values between carb and toby vals
 
 You can also embed plots, for example:
-
+#this segment is used remove NA values from the data 
+and provide a summary about the two files being read
 ```{r pressure, echo=FALSE}
 pseudo<-read.csv("responses-pseudo.csv")
 summary(pseudo)
@@ -40,6 +41,7 @@ pseudo<-pseudo[good,]
 summary(pseudo)
 ```
 
+#The following code segment plots the number of TRUE/FALSE for each value we are considering
 
 ```{r}
 ggplot(pseudo, aes(factor(carb))) + geom_bar(width = 0.5, fill="light blue", color= "red") + ggtitle("(A) Count of responses to carbenicillin (in pseudomonas)")
@@ -48,6 +50,10 @@ ggplot(staph, aes(factor(resp))) + geom_bar(width = 0.5, fill="light pink", colo
 
 ```
 
+#gives the distance matrix and phylogenetic tree for the given .fasta file.
+do recommend reading the source file pages for examples and how to install the packages/dependencies. Does not install
+in one try
+if it does, let me know because I have Windows
 
 ```{r}
 library(adegenet)
