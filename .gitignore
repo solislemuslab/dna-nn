@@ -1,6 +1,7 @@
 # This project
 data/*
 zhaoyi/.ipynb_checkpoints/*
+zhaoyi/__pycache__
 
 # Compiled source #
 ###################
