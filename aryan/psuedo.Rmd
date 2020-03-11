@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 
@@ -16,14 +17,15 @@ knitr::opts_chunk$set(echo = TRUE)
 You can also embed plots, for example:
 #this segment is used remove NA values from the data 
 and provide a summary about the two files being read
-```{r pressure, echo=FALSE}
-pseudo<-read.csv("responses-pseudo.csv")
+```{r}
+pseudo<-read.csv("/home/aryan/Desktop/DNA-nn/responses-pseudo.csv")
+
 summary(pseudo)
 good<-complete.cases(pseudo)
 pseudo<-pseudo[good,]
 counter<-c(pseudo['carb'][])
 
-staph<-read.csv("responses-staph.csv")
+staph<-read.csv("/home/aryan/Desktop/DNA-nn/responses-staph.csv")
 good<-complete.cases(staph)
 staph<-staph[good,]
 summary(staph)
@@ -57,7 +59,7 @@ if it does, let me know because I have Windows
 
 ```{r}
 library(adegenet)
-dna <- fasta2DNAbin(file="concatenated.fasta")
+dna <- fasta2DNAbin(file="/home/aryan/Desktop/DNA-nn/concatenated.fasta")
 library(ape)
 D <- dist.dna(dna, model = "TN93")
 length(D)
@@ -69,3 +71,37 @@ title("UPGMA tree")
 ```
 
 
+```{r}
+#library(adegenet)
+#gen_light <- fasta2genlight(file="/home/aryan/Desktop/DNA-nn/concatenated.fasta")
+#grp <- find.clusters(gen_light, max.n=50, n.pca=200, scale=FALSE)
+tre <- nj(D)
+class(tre)
+tre <- ladderize(tre)
+tre
+plot(tre, cex = 0.6)
+title("A Simple NJ Tree")
+```
+
+
+```{r}
+h_cluster <- hclust(D, method = "average", members = NULL) # method = average is used for UPGMA, members can be equal to NULL or a vector with a length of size D
+plot(h_cluster, cex = 0.6)
+```
+
+
+
+#CLUSTERING USING THE TRUE FALSE VALUES
+#we can use the total area method 
+#Do consider that 
+
+```{r}
+plot(tre, show.tip=FALSE) # gets rid of the labels on the end, refer to the first tree depicted above
+title("Unrooted NJ tree")
+myPal <- colorRampPalette(c("red","blue"))
+library(dplyr)
+pseudo <- pseudo %>% mutate(carb2Num = as.numeric(carb))
+tiplabels(pseudo$carb2Num, bg=num2col(pseudo$carb2Num, col.pal=myPal), cex=.5) #we use the responses dataset to get the TRUE/FALSE values
+temp <- pretty(2:3, 2)
+legend("bottomleft", fill=num2col(temp, col.pal=myPal), leg=temp, ncol=2)
+```
