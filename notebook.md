@@ -44,6 +44,12 @@ Next steps:
 - We can see if these clusters match the labels (resistant/susceptible) by plotting them
 - Investigate transfer learning, data augmentation, and standard statistics methods like regression
 
+## New data
+
+- File `saureus_core_gene_alignment.tar.gz`
+From Jon Moller (Tim Read's lab):
+The core-genome alignment contains each set of core genes (common to all 263 strain genomes) for each strain in a FASTA alignment file. There are indeed 263 core genomes total as you stated.
+
 # Analyses
 
 Next steps: We want to fit statistical/machine-learning models to accomplish two tasks:
