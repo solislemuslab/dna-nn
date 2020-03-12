@@ -1,4 +1,4 @@
-- Condonify
+- Codonify
 - Imputation
 - Feature selection
   - [variance threshold](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.VarianceThreshold.html#sklearn.feature_selection.VarianceThreshold)
