@@ -8,3 +8,4 @@
 - Feature extraction
   - [principle components analysis](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA)
   - [t-distributed stochastic neighbor embedding](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE)
+  - Autoencoder
