@@ -65,3 +65,11 @@ def load_nucleotides(path):
     src = SeqIO.parse(path, 'fasta')
     n.index = [record.id for record in src]
     return n
+
+def load_condons(path):
+    src = SeqIO.parse(path, 'fasta')
+    c = pd.DataFrame([[seq.seq._data[i:i+3] for i in range(0, len(seq), 3)] for seq in src])
+
+    src = SeqIO.parse(path, 'fasta')
+    c.index = [record.id for record in src]
+    return c
