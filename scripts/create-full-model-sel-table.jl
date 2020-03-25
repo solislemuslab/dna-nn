@@ -6,15 +6,16 @@
 ## Staph (this could be done more efficiently with a Dict, good enough for now)
 impute = ["yes","no"]
 inputmatrix = ["codon", "original", "snp"]
-featsel = ["no", "varThreshold", "recursive", "chi2"]
+featsel = ["no", "varThreshold"]
 featext = ["no", "pca", "tsne"]
 response = ["binary", "numerical"]
-data = ["original", "appended"]
-models = ["regression", "RF", "SVM"]
+data = ["original"]
+models = ["regression", "RF", "NN"]
+penalty = ["no", "lasso", "ridge"]
 
 using DataFrames
 df = DataFrame(impute="", inputmatrix="", featsel="", featext="",
-               response="", data="", models="")
+               response="", data="", models="", penalty = "")
 
 for i in impute
     for ii in inputmatrix
@@ -23,7 +24,9 @@ for i in impute
                 for r in response
                     for d in data
                         for m in models
-                            push!(df, [i,ii,fs,fe,r,d,m])
+                            for p in penalty
+                                push!(df, [i,ii,fs,fe,r,d,m,p])
+                            end
                         end
                     end
                 end
@@ -33,7 +36,7 @@ for i in impute
 end
 
 df = df[2:end,:] ##remove first row created just to assign type to entries
-##864×7 DataFrame
+##648×8 DataFrame
 
 using CSV
 CSV.write("../results/staph-FMS.csv", df)
@@ -44,14 +47,15 @@ CSV.write("../results/staph-FMS.csv", df)
 ## Pseudomonas (this could be done more efficiently with a Dict, good enough for now)
 impute = ["yes","no"]
 inputmatrix = ["codon", "original", "snp"]
-featsel = ["no", "varThreshold", "recursive", "chi2"]
+featsel = ["no", "varThreshold"]
 featext = ["no", "pca", "tsne"]
 response = ["binary", "numerical"]
-models = ["regression", "RF", "SVM"]
+models = ["regression", "RF", "NN"]
+penalty = ["no", "lasso", "ridge"]
 
 using DataFrames
 df = DataFrame(impute="", inputmatrix="", featsel="", featext="",
-               response="", models="")
+               response="", models="", penalty="")
 
 for i in impute
     for ii in inputmatrix
@@ -59,7 +63,9 @@ for i in impute
             for fe in featext
                 for r in response
                     for m in models
-                        push!(df, [i,ii,fs,fe,r,m])
+                        for p in penalty
+                            push!(df, [i,ii,fs,fe,r,m,p])
+                        end
                     end
                 end
             end
@@ -68,7 +74,7 @@ for i in impute
 end
 
 df = df[2:end,:] ##remove first row created just to assign type to entries
-##432×7 DataFrame
+##648×7 DataFrame
 
 using CSV
 CSV.write("../results/pseudo-FMS.csv", df)
