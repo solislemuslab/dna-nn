@@ -8,7 +8,6 @@ def load_pseudo():
     # load responses-pseudo.csv - the result of antibiotic resistence of pseudomonas
     # 122 * 2 (2 antibiotics)
     resp = pd.read_csv('../data/pseudo/responses-pseudo.csv', names=['id', 'lab-id', 'carb', 'toby'], skiprows=1)
-    resp.drop('lab-id', axis=1, inplace=True)
 
     # load concatenated.fasta - the gene sequence of pseudomonas
     # 122 * (483333 -> 261868)
