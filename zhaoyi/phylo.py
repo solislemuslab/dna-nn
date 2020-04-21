@@ -46,8 +46,18 @@ def upgma(df, copy=True):
             df.rename(mapper=lambda s: s if s != a else '({},{})'.format(a, b), axis=1, inplace=True)
     return df.index[0]+';'
 
-def draw_tree(path, title, format='newick'):
+def draw_tree(path, output, title, labels, colors=['green', 'red', 'black'], format='newick'):
+    fontdict = {'fontsize': '25'}
     tree = Phylo.read(path, format=format)
-    plt.figure(figsize=(23, 23))
-    plt.title(title)
-    Phylo.draw(tree, axes=plt.gca())
+    fig, ax = plt.subplots(figsize=(23, 23))
+    ax.set_title(title, fontdict=fontdict)
+    ax.set_xlabel(ax.get_xlabel(), **fontdict)
+    ax.set_ylabel(ax.get_ylabel(), **fontdict)
+    
+    label_colors = labels.apply(lambda x: colors[x])
+    handles = [ax.scatter([], [], c=c) for c in colors]
+    labels = ['False', 'True', "NA"]
+    ax.legend(handles=handles, labels=labels, fontsize='xx-large',
+              title='Class label', title_fontsize='xx-large')
+    Phylo.draw(tree, axes=ax, label_colors=label_colors.to_dict())
+    fig.savefig(f'graphs/{output}.png', bbox_inches='tight');

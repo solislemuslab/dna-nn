@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from Bio import SeqIO
 
-def load_pseudo():
+def load_pseudo(numerical=False):
     ## Load Pseudomonas data
     # load responses-pseudo.csv - the result of antibiotic resistence of pseudomonas
     # 122 * 2 (2 antibiotics)
@@ -12,7 +12,7 @@ def load_pseudo():
     # load concatenated.fasta - the gene sequence of pseudomonas
     # 122 * (483333 -> 261868)
     src = SeqIO.parse('../data/pseudo/concatenated.fasta', 'fasta')
-    data = [(record.id, record.seq._data) for record in src]
+    data = [(record.id, record.seq._data.upper()) for record in src]
     seq = pd.DataFrame(data=data, columns=['id', 'sequence'])
     seq_len_pseudo = len(seq['sequence'][0])
     seq['missing'] = seq['sequence'].apply(lambda seq: Counter(seq)['-'])
@@ -25,12 +25,19 @@ def load_pseudo():
     seq_i['missing_i'] = seq_i['sequence_i'].apply(lambda seq: Counter(seq)['-'])
     seq_i['missing_%_i'] = seq_i['missing_i'] / seq_len_pseudo * 100
 
-    # combine three files
-    records_pseudo = pd.merge(seq, seq_i, on='id')
-    records_pseudo = pd.merge(records_pseudo, resp, on='id')
-    return records_pseudo
+    # combine everything
+    records = pd.merge(seq, seq_i, on='id')
+    records = pd.merge(records, resp, on='id')
+    if numerical:
+        numerical_response = pd.read_csv('../data/pseudo/Perron_phenotype-GSU-training.csv')
+        records = records.merge(numerical_response[['strain', 'carb.lag.delta', 'toby.lag.delta']],
+                                left_on='lab-id', right_on='strain', how='left')
+        records.rename(columns={'carb.lag.delta': 'carb_num', 'toby.lag.delta': 'toby_num'}, inplace=True)
+        records.drop(columns=['strain', 'lab-id'], inplace=True)
+    
+    return records
 
-def load_staph():
+def load_staph(numerical=False):
     ## Load Staphylococcus data
     # load responses-staph.csv - the result of antibiotic resistence of staphylococcus
     # 125 * 1
@@ -52,10 +59,16 @@ def load_staph():
     seq_i['missing_i'] = seq_i['sequence_i'].apply(lambda seq: Counter(seq)['-'])
     seq_i['missing_%_i'] = seq_i['missing_i'] / seq_len_staph * 100
 
-    # combine three files
-    records_staph = pd.merge(seq, seq_i, on='id')
-    records_staph = pd.merge(records_staph, resp, on='id')
-    return records_staph
+    # combine everything
+    records = pd.merge(seq, seq_i, on='id')
+    records = pd.merge(records, resp, on='id')
+    if numerical:
+        numerical_response = pd.read_csv('../data/staph/nrs_metadata3.txt', delimiter='\t')
+        records = records.merge(numerical_response[['sample_tag', 'Total.Area']],
+                                left_on='id', right_on='sample_tag', how='left')
+        records.drop(columns='sample_tag', inplace=True)
+
+    return records
 
 def load_nucleotides(path):
     src = SeqIO.parse(path, 'fasta')
