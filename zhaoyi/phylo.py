@@ -60,4 +60,4 @@ def draw_tree(path, output, title, labels, colors=['green', 'red', 'black'], for
     ax.legend(handles=handles, labels=labels, fontsize='xx-large',
               title='Class label', title_fontsize='xx-large')
     Phylo.draw(tree, axes=ax, label_colors=label_colors.to_dict())
-    fig.savefig(f'graphs/{output}.png', bbox_inches='tight');
+    fig.savefig(f'graph/{output}.png', bbox_inches='tight');
