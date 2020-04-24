@@ -5,7 +5,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 ```
 
 
@@ -94,7 +93,6 @@ plot(h_cluster, cex = 0.6)
 #CLUSTERING USING THE TRUE FALSE VALUES
 #we can use the total area method 
 #Do consider that 
-
 ```{r}
 plot(tre, show.tip=FALSE) # gets rid of the labels on the end, refer to the first tree depicted above
 title("Unrooted NJ tree")
@@ -105,3 +103,54 @@ tiplabels(pseudo$carb2Num, bg=num2col(pseudo$carb2Num, col.pal=myPal), cex=.5) #
 temp <- pretty(2:3, 2)
 legend("bottomleft", fill=num2col(temp, col.pal=myPal), leg=temp, ncol=2)
 ```
+
+
+
+```{r}
+library(seqinr)
+#staph <- read.alignment(file="/home/aryan/Desktop/DNA-nn/core_gene_alignment-narsa.aln", format="fasta")
+library(ape)
+library(adegenet)
+staphDNAbin<-fasta2DNAbin(file="/home/aryan/Desktop/DNA-nn/core_gene_alignment-narsa.aln")
+```
+
+
+```{r}
+D <- dist.dna(staphDNAbin, model = "TN93")
+length(D)
+temp <- as.data.frame(as.matrix(D))
+table.paint(temp, cleg=0, clabel.row=.5, clabel.col=.5) #darker shades of gray mean a larger distance # you can also make cool color plots but they're much more complicated because they use the image() function
+tre3 <- as.phylo(hclust(D,method="average"))
+plot(tre3, cex=.5)
+title("UPGMA tree")
+
+#used for Neighbor joining tree. 
+tre <- nj(D)
+class(tre)
+tre <- ladderize(tre)
+tre
+plot(tre, cex = 0.6)
+title("A Simple NJ Tree")
+h_cluster <- hclust(D, method = "average", members = NULL) # method = average is used for UPGMA, members can be equal to NULL or a vector with a length of size D
+plot(h_cluster, cex = 0.6)
+plot(tre, show.tip=FALSE) # gets rid of the labels on the end, refer to the first tree depicted above
+title("Unrooted NJ tree")
+myPal <- colorRampPalette(c("red","blue"))
+
+#library(dplyr)
+#staph <- staph %>% mutate(resp2Num = as.numeric(resp))
+#tiplabels(staph$resp2num, bg=num2col(staph$resp2num, col.pal=myPal), cex=.5) #we use the responses dataset to get the TRUE/FALSE values
+#temp <- pretty(2:3, 2)
+#legend("bottomleft", fill=num2col(temp, col.pal=myPal), leg=temp, ncol=2)
+```
+#```{r}
+library(mice)
+md.pattern(phyto)
+phy<-as.character(phyto)
+mice_plot <- aggr(phy, col=c('navyblue','yellow'),
+numbers=TRUE, sortVars=TRUE,
+labels=names(iris.mis), cex.axis=.7,
+gap=3, ylab=c("Missing data","Pattern"))
+dna.mis <- prodNA(phy, noNA = 0.1)
+```
+
