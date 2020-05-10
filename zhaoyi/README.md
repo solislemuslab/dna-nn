@@ -21,5 +21,5 @@ Note: Some pre-processing or model training may take a while to execute.
 
 ### Plotting
 
-- [graph.ipynb](https://github.com/solislemuslab/dna-nn/blob/master/zhaoyi/graph.ipynb) - Produce most of the figures in this project. See the notebook for those figures.
+- [figure.ipynb](https://github.com/solislemuslab/dna-nn/blob/master/zhaoyi/figure.ipynb) - Produce most of the figures in this project. See the notebook for those figures.
 - [decision_tree.ipynb](https://github.com/solislemuslab/dna-nn/blob/master/zhaoyi/decision_tree.ipynb) - Train decision trees on pre-processing and model choices to identify the best data analysis combinations. Visualize performance of all models.
