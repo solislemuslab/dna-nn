@@ -1,0 +1,117 @@
+---
+title: "phylo analysis - staph"
+author: "Lareina Xiaoyu Liu"
+date: "3/20/2020"
+output: html_document
+---
+
+Load responses to antibiotics
+```{r}
+library(dplyr)
+resp = read.csv("../data/staph/responses-staph.csv") %>% na.omit()
+head(resp)
+```
+
+Load DNA sequence data
+```{r}
+library(adegenet)
+seq = fasta2DNAbin("../data/staph/core_gene_alignment-narsa.aln")
+```
+
+Distance-Based Phylogenies
+```{r}
+library(ape)
+pdist = dist.dna(seq, model = "TN93") 
+length(pdist) 
+```
+
+```{r}
+df_pdist = as.data.frame(as.matrix(pdist))
+table.paint(df_pdist, cleg=0, clabel.row=.5, clabel.col=.5) 
+```
+
+```{r}
+tree = nj(pdist)
+tree = ladderize(tree)
+tree 
+```
+
+```{r}
+plot(tree, cex = 0.7, lwd =1)
+title("NJ tree for S. aureus with toxicity indicators")
+tiplabels(resp$resp, bg=resp$resp, cex=0.5) 
+legend("bottomleft", fill=c("red", "green"), legend=unique(resp$resp)[1:2])
+```
+
+```{r}
+# is NJ approporiate?
+x = as.vector(pdist)
+y = as.vector(as.dist(cophenetic(tree)))
+plot(x, y, xlab="original pairwise distances", ylab="pairwise distances on the tree", main="NJ's goodness of fit", pch=20, col=transp("black",.1), cex=3)
+abline(lm(y~x), col="red")
+```
+
+```{r}
+h_cluster <- hclust(pdist, method = "average", members = NULL)
+plot(h_cluster, cex = 0.6)
+```
+
+```{r}
+tree2 = as.phylo(hclust(pdist, method="average"))
+plot(tree2, cex = 0.7, lwd =1)
+title("UPGMA tree for S. aureus with toxicity indicators")
+tiplabels(resp$resp, bg=resp$resp, cex=0.5) 
+legend("bottomleft", fill=c("red", "green"), legend=unique(resp$resp)[1:2])
+```
+
+
+```{r}
+y <- as.vector(as.dist(cophenetic(tree2)))
+plot(x, y, xlab="original pairwise distances", ylab="pairwise distances on the tree", main="UPGMA's goodness of fit", pch=20, col=transp("black",.1), cex=3)
+abline(lm(y~x), col="red")
+```
+
+```{r}
+library("phangorn")
+phangorn_seq = as.phyDat(seq)
+(fit1 = pml(tree, phangorn_seq, k=4))
+```
+
+
+```{r}
+(fit2 = optim.pml(fit1, optNni=TRUE, optBf=TRUE, optQ=TRUE, optGamma=TRUE))
+```
+
+```{r}
+anova(fit1, fit2)
+```
+
+```{r}
+AIC(fit1)
+```
+
+```{r}
+AIC(fit2)
+```
+
+```{r}
+tree3 <- root(fit2$tree, 1)
+tree3 <- ladderize(tree3)
+plot(tree3, edge.width=2)
+title("Maximum-likelihood tree for S. aureus with toxicity indicators")
+tiplabels(resp$resp, bg=resp$resp, cex=0.5, fg="transparent")
+axisPhylo()
+legend("topright", fill=c("red", "green"), legend=unique(resp$resp)[1:2])
+```
+
+```{r}
+plot(unroot(tree),type="unrooted",cex=0.6,
+    use.edge.length=FALSE,lab4ut="axial",
+    no.margin=TRUE)
+```
+
+```{r}
+plot(tree, "f", FALSE, cex = 0.5)
+```
+
+
