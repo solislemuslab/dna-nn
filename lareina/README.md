@@ -1,7 +1,6 @@
 # Phylogenetic Analyses
 
-- [phylo_pseudo.Rmd](https://github.com/solislemuslab/dna-nn/blob/master/lareina/phylo_pseudo.Rmd) & [phylo_staph.Rmd](https://github.com/solislemuslab/dna-nn/blob/master/lareina/phylo_staph.Rmd): 
-Performed phylogenetic analysis by visualizing NJ, UPGMA, and Maximum-likelihood trees, checked their goodness of fit. 
+- [phylo_pseudo.Rmd](https://github.com/solislemuslab/dna-nn/blob/master/lareina/phylo_pseudo.Rmd) & [phylo_staph.Rmd](https://github.com/solislemuslab/dna-nn/blob/master/lareina/phylo_staph.Rmd) - Performed phylogenetic analysis by visualizing NJ, UPGMA, and Maximum-likelihood trees, checked their goodness of fit. 
 
 # Visualizations
 - [visualizations.ipynb](https://github.com/solislemuslab/dna-nn/blob/master/lareina/visualizations.ipynb) - Visualized sequence and response data of both Pseudomonas aeruginosa and Staphylococcus aureus. 
