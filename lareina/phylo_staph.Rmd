@@ -66,6 +66,7 @@ legend("bottomleft", fill=c("red", "green"), legend=unique(resp$resp)[1:2])
 
 
 ```{r}
+# is UPGMA approporiate?
 y <- as.vector(as.dist(cophenetic(tree2)))
 plot(x, y, xlab="original pairwise distances", ylab="pairwise distances on the tree", main="UPGMA's goodness of fit", pch=20, col=transp("black",.1), cex=3)
 abline(lm(y~x), col="red")
@@ -113,5 +114,3 @@ plot(unroot(tree),type="unrooted",cex=0.6,
 ```{r}
 plot(tree, "f", FALSE, cex = 0.5)
 ```
-
-
