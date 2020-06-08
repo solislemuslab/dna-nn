@@ -114,3 +114,4 @@ plot(unroot(tree),type="unrooted",cex=0.6,
 ```{r}
 plot(tree, "f", FALSE, cex = 0.5)
 ```
+
