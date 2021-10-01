@@ -3,7 +3,6 @@ data/*
 zhaoyi/.ipynb_checkpoints/*
 zhaoyi/__pycache__/*
 zhaoyi/practice/.ipynb_checkpoints/*
-reports/*
 
 # Compiled source #
 ###################

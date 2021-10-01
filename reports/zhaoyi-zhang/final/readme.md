@@ -1,0 +1,2 @@
+- The final report is the same as the one in resubmission with some typos fixed
+- Decided to weave as html (instead of pdf) because tables look better
