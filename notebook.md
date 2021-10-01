@@ -1,6 +1,19 @@
-# Data
+# Neural network models
 
-Copied from `NIH/R01-neural-nets/Oct2019/preliminary-data`.
+We have worked done for the preliminary results on the submitted R01
+
+
+# Machine learning project Fall 2019-2020
+People
+- Aryan Adhlakha (junior, CS)
+- Lareina Liu (senior, stat)
+- Zhaoyi (Kevin) Zhang (sophomore, CS+DS)
+
+Folder: `ml-methods`.
+
+## Data
+
+Copied from `NIH/R01-neural-nets/Oct2019/preliminary-data`. We put in `data/data1`.
 
 We have two datasets
 
@@ -14,7 +27,7 @@ We have two datasets
     - columns=nucleotide sites (features)
 - Labels for Pseudomonas bacteria (0=susceptible to antibiotic, 1=resistant to antibiotic): `responses-pseudo.csv`
 
-## Data description (meeting 1/29)
+### Data description (meeting 1/29)
 - 2 datasets:
     - Pseudomonas Matrix: 122 by 483,333; missingness rate: 9.70% on average, 17.13% highest
         - Two antibiotics: carb and toby. Each label vector is true/false
@@ -44,13 +57,13 @@ Next steps:
 - We can see if these clusters match the labels (resistant/susceptible) by plotting them
 - Investigate transfer learning, data augmentation, and standard statistics methods like regression
 
-## New data
+### New data
 
 - File `saureus_core_gene_alignment.tar.gz`
 From Jon Moller (Tim Read's lab):
 The core-genome alignment contains each set of core genes (common to all 263 strain genomes) for each strain in a FASTA alignment file. There are indeed 263 core genomes total as you stated.
 
-# Analyses
+## Analyses
 
 Next steps: We want to fit statistical/machine-learning models to accomplish two tasks:
 - feature selection: identify genes associated with antibiotic-resistance
@@ -62,13 +75,18 @@ Methods:
 - neural networks
 - ...
 
-## Main difficulties in this project
+### Main difficulties in this project
 - Input data are categories/letters: ACGT, cannot be treated as numbers 1234
 - There is correlation among rows and among columns. For example, every three letters in the genome corresponds to one "codon"
 - Biologists want to know how many individual bacteria they need to sequence to train the method with high prediction accuracy 
 
-## Previous work
+### Previous work
 
 Claudia had fit naive neural networks and random forest in Julia. All scripts in `scripts/previous-work`:
 - `notebook.md`: explains pre-processing of the data
 - `*.jl`: julia scripts, described in `notebook.md`
+
+
+## Results and scripts
+
+Everything is in the `ml-methods` folder. Note that we did not fit any NN in this part of the project. We fit logistic regression, SVMs and RFs.
