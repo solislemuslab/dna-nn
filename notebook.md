@@ -274,6 +274,10 @@ All the models are saved in `results/model-accuracy.csv`.
 We will use the Julia package [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl) to fit a random forest to compare the accuracy of NN. See `understand-input-decisiontrees.jl` to understand the type of input.
 We will create `fit-randForest.jl` and rerun for all datasets. For some reason this feels better than modifying `fit-nn.jl`.
 
+## Summarizing results in a plot:
+
+R script: `plot-results.r` from the Rmd proposal.
+
 
 # Machine learning project Fall 2019-2020
 People
