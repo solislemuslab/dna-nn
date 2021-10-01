@@ -4,6 +4,8 @@ We have worked done for the preliminary results on the submitted R01
 All details of the preliminary work are in the `nn-methods/full-notebook.md` file, but we summarize below only the section corresponding to Pseudomonas and sequences.
 Data in folder: `data/data2`.
 
+Because we copied the following commands from the original `full-notebook.md`, paths might not work.
+
 ## Data
 
 From [Dropbox folder](https://www.dropbox.com/sh/0clxfxxyaf8k6ds/AAArGoD46V5noKoD3piJQa20a?dl=0), we have the subfolder `CDS-OGs`, which we copy here.
@@ -267,7 +269,7 @@ Different models tried (in `model-pseudomonas-sequences.jl`):
 All the models are saved in `results/model-accuracy.csv`.
 
 
-# Comparing to Random Forest
+## Comparing to Random Forest
 
 We will use the Julia package [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl) to fit a random forest to compare the accuracy of NN. See `understand-input-decisiontrees.jl` to understand the type of input.
 We will create `fit-randForest.jl` and rerun for all datasets. For some reason this feels better than modifying `fit-nn.jl`.
