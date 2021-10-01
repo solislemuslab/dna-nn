@@ -1,3 +1,10 @@
+# To do
+- no missingness with zero (daniel work)
+- in the future, predict both antibiotics for pseudomonas: carb, toby like they do in Chen2019
+- in future study conv.jl from flux zoo because we might want to keep the images as images
+- loss that handles unbalance in phenotype
+- fixit fit-nn: better model (based on papers), better loss (account for unbalanced), maybe run in loma
+
 # Software remarks
 - Keep in mind that we need master branch of JLD: `(v1.1) pkg> add JLD#master`
 
@@ -148,7 +155,6 @@ awk -F ',' '{for(i=1;i<=27076;i++)printf "%s ",$i;printf "\n"}' core_gene_alignm
 awk -F ',' '{for(i=27077;i<=NF;i++)printf "%s ",$i;printf "\n"}' core_gene_alignment-narsa.csv > core_gene_alignment-narsa-subset2.csv
 ```
 
-Here, we convert data to matrix of integers, but this is a bad idea! We should not convert ACGT to 1234, we should treat as categories, or maybe try to read as words?
 ```julia
 ## -----------------------------
 ## Saving as julia data files
@@ -283,6 +289,240 @@ Note: We have only one `fit-nn.jl`, and put the specific model in `model-staph.j
 
 # Pseudomonas analyses
 
+## Images
+
+### Data
+
+ Courtesy of Jennifer Rattray. See [here](https://danielpimentel.github.io/teaching.html) and [here](https://www.dropbox.com/sh/1lp3ke597r9f1dt/AADhOtyEVroUKHd9Zw8XRUZXa?dl=0). The link for the testing folder was emailed by Jennifer.
+
+ Folder `PIL_3dayLBCR-training` has:
+    - `Perron_phenotype-GSU-training.xlsx` with phenotypes of interest for 234 strains. We will use 
+        - `carb.lag.delta`: difference in lag between carbenicillin and control (antibiotic resistance)
+        - `toby.lag.delta`: difference in lag between tobramycin and control (antibiotic resistance)
+    - Images of the form: `PIL-X_3dayLBCR-Y.jpg` where X=strain (1-374 not consecutive, 69 strains only) and Y=image number
+
+Folder `PIL_3dayLBCR-testing` has:
+    - `Perron_phenotype-GSU-testing.xlsx` which we will not use because we will use the training one
+    - Images of the form: `PIL-X_3dayLBCR-Y.jpg` where X=strain (7-345 not consecutive, 15 strains only) and Y=image number
+
+### Creating input files
+
+This script takes:
+- `Perron_phenotype-GSU-training.xlsx`: 234 strains (1-374 not consecutive), 2 phenotypes of interest: `carb.lag.delta`, `toby.lag.delta`
+- Images of the form: `PIL-X_3dayLBCR-1.jpg` in two folders: ``PIL_3dayLBCR-training` (69 strains), `PIL_3dayLBCR-testing` (17 strains)
+
+and creates the JLD files (`xxx`=training or testing):
+- `features-xxx.jld` : images
+- `labels-carb-xxx.jld`: phenotype carb
+- `labels-toby-xxx.jld`: phenotype toby
+- `strain-xxx.jld`: strain ID (only for reference, not needed in NN)
+- `labels-carb.jld`: phenotype carb concatenating training and testing
+- `labels-toby.jld`: phenotype toby concatenating training and testing
+
+
+#### Comparing strains with image and with phenotypes
+
+We will check which are the strains with image
+```shell
+cd Dropbox/Sharing/personal/ClauDan/work/grants/NIH/R01-neural-nets/Oct2019/preliminary-data/data/pseudomonas/
+ls PIL_3dayLBCR-training/*.jpg > strains-image-files-training.txt
+ls PIL_3dayLBCR-testing/*.jpg > strains-image-files-testing.txt
+```
+
+And we will save the strain IDs in these files (as there are repeated images per strain):
+```julia
+using CSV, DataFrames
+imgs = CSV.read("strains-image-files-training.txt", header=false)
+ids = fill(0,size(imgs,1))
+for i in 1:size(imgs,1)
+    s = split.(split(imgs[i,1],'_'),'-')
+    try 
+        ids[i] = parse(Int,s[2][3])
+    catch ##special case 55a
+        ss = split(s[2][3],'a')
+        ids[i] = parse(Int,ss[1])
+    end
+end
+
+ids = unique(ids)
+sort!(ids)
+df = DataFrame(strains=ids)
+CSV.write("strain-ids-images-training.txt",df)
+
+imgs = CSV.read("strains-image-files-testing.txt", header=false)
+ids = fill(0,size(imgs,1))
+for i in 1:size(imgs,1)
+    s = split.(split(imgs[i,1],'_'),'-')
+    try 
+        ids[i] = parse(Int,s[2][3])
+    catch
+        ss = split(s[2][3],'a')
+        ids[i] = parse(Int,ss[1])
+    end
+end
+
+ids = unique(ids)
+sort!(ids)
+df = DataFrame(strains=ids)
+CSV.write("strain-ids-images-testing.txt",df)
+```
+
+Now, we need to compare to the strains that we have in the phenotype file. First, we need to save as CSV (manually): `Perron_phenotype-GSU-training.csv`.
+```julia
+cd("/Users/Clauberry/Dropbox/Sharing/personal/ClauDan/work/grants/NIH/R01-neural-nets/Oct2019/preliminary-data/data/pseudomonas")
+pheno = CSV.read("Perron_phenotype-GSU-training.csv", header=true)
+ids = unique(pheno[:strain]) ## 234
+df = DataFrame(strains=ids)
+CSV.write("strain-ids-pheno.txt",df)
+```
+
+Thus, we compare the strains:
+```julia
+using CSV
+training = CSV.read("strain-ids-images-training.txt")
+testing = CSV.read("strain-ids-images-testing.txt")
+pheno = CSV.read("strain-ids-pheno.txt")
+
+strainsImage = union(training[:strains],testing[:strains]) ## 86 strains
+strainsImgPheno = intersect(pheno[:strains],strainsImage) ## 85 strains
+setdiff(strainsImage, strainsImgPheno) ## strain 25
+```
+We do not have phenotype for strain 25, but we will remove it from now.
+
+#### Reading in the images and phenotypes
+
+Now, we want to read all the images for the 69 strains, and then the 17 strains. Note that the individual images are really big:
+```julia
+using FileIO, Images
+img = FileIO.load("PIL_3dayLBCR-training/PIL-1_3dayLBCR-1.jpg")
+## 9840×10560 Array{RGB4{N0f8},2} with eltype RGB4{Normed{UInt8,8}}
+```
+so we will use the [`ImageTransformations`](https://juliaimages.org/latest/imagetransformations/) package to reduce the resolution of the images slightly. Otherwise, the resulting input matrix (with all training images) is 60Gb big! Alternatively, we could have used `imagemagick` to manipulate images, but we decided to do everything in julia:
+```
+brew search imagemagick
+convert ${inputfilename} -resize 10% ${outputfilename}
+```
+We will also store as gray images, instead of color.
+
+We will do the following code **twice**: once for training and once for testing files.
+Run for both training and testing:
+```julia
+cd("/Users/Clauberry/Dropbox/Sharing/personal/ClauDan/work/grants/NIH/R01-neural-nets/Oct2019/preliminary-data/data/pseudomonas")
+
+## IMPORTANT: choose here which folder
+folder = "training"
+folder = "testing"
+
+using FileIO, Images, CSV, DataFrames, JLD, ImageTransformations
+files = CSV.read(string("strains-image-files-",folder,".txt"), header=false)
+pheno = CSV.read("Perron_phenotype-GSU-training.csv", header=true)
+
+images = Array{Array{Gray{Normed{UInt8,8}},2},1}(undef,length(files[:Column1]))
+carb = Array{Union{Number,Missing},1}(undef, length(files[:Column1]))
+toby = Array{Union{Number,Missing},1}(undef, length(files[:Column1]))
+strain = Array{Number,1}(undef, length(files[:Column1]))
+missInd = Integer[]
+
+##rr = 1/8 ## images-training.jld is 946Mb
+##rr = 1/2 ## images-training.jld is 15Gbs
+##rr = 1/4 ## images-training.jld is 4Gbs
+## instead of rr=1/4, we will use a fixed size because
+## images have different sizes (size based on rr=1/4),
+## but later we divided by 2, ow features ~13G
+ll = div(2460,2)
+ul = div(2640,2)
+GC.gc()
+count = [1]
+
+for l in files[:Column1]
+    @show l
+    GC.gc()
+    s = split.(split(l,'_'),'-')
+    id = [0]
+    try 
+        id[1] = parse(Int,s[2][3])
+    catch
+        ss = split(s[2][3],'a')
+        id[1] = parse(Int,ss[1])
+    end
+    ind = findall(x->x==id[1],pheno[:strain])
+    @show id[1]
+    strain[count[1]] = id[1]    
+    if(length(ind) == 0)
+        @warn "could not find the phenotype for strain $id"
+        carb[count[1]] =  missing
+        toby[count[1]] =  missing
+        push!(missInd, count[1])
+        ## we don't read the image in this case
+    else
+        length(ind) > 1 && error("More than one phenotype for strain $id")
+        ii = ind[1]
+        carb[count[1]] =  pheno[Symbol("carb.lag.delta")][ii]
+        toby[count[1]] =  pheno[Symbol("toby.lag.delta")][ii]
+        img = FileIO.load(l)
+        images[count[1]] = Gray.(imresize(img,ll,ul))
+    end
+    count[1] += 1
+end
+GC.gc()
+
+num = size(images,1) ## 266, 65
+
+## for training only: need to remove strains with missing phenotypes
+length(missInd) > 4 && error("there should be only one missing strain")
+deleteat!(images,missInd)
+deleteat!(carb,missInd)
+deleteat!(toby,missInd)
+deleteat!(strain,missInd)
+
+## Save to JLD
+save(string("images-",folder,".jld"), "images", images)
+save(string("labels-carb-",folder,".jld"), "carb", carb)
+save(string("labels-toby-",folder,".jld"), "toby", toby)
+save(string("strain-",folder,".jld"), "strain", strain)
+
+## Reading labels again to concatenate
+carbtest = load("labels-carb-testing.jld", "carb")
+## 65-element Array{Union{Missing, Number},1}
+carbtrain = load("labels-carb-training.jld", "carb")
+## 262-element Array{Union{Missing, Number},1}
+tobytest = load("labels-toby-testing.jld", "toby")
+## 65-element Array{Union{Missing, Number},1}
+tobytrain = load("labels-toby-training.jld", "toby")
+## 262-element Array{Union{Missing, Number},1}
+
+## resistant:1 (-infinity -> 0) and susceptible:0 (0 -> +infinity)
+carb = vcat(carbtrain, carbtest).<0
+##327-element BitArray{1}
+toby = vcat(tobytrain, tobytest).<0
+##327-element BitArray{1}
+
+## Saving as JLD as concatenated now
+save("labels-carb.jld", "carb", carb)
+save("labels-toby.jld", "toby", toby)
+```
+
+We are not doing creating the `features.jld` file because it would be too heavy. So, we do that in the `data-preprocess-pseudomonas-image.jl`, which will be called inside `fit-nn.jl`.
+
+### Exploratory checks
+
+We use the script `exploratory-response.jl` to see if we have a highly unbalanced case. For the pseudomonas image data: 
+- `carb` response, we have 15% resistant strains, and 85% non-resistant
+- `toby` response, we have 4% resistant strains, and 96% non-resistant (we will probably not used this response) 
+so we will need to adjust the loss function.
+
+### Neural network fitting: Running Flux.jl
+
+Input files:
+- `features.jld`
+- `labels.jld`
+- Model specification in `model-pseudomonas-images.jl`
+
+Different models tried (in `model-pseudomonas-images.jl`):
+- Model 1, Accuracy: 0.41284403669724773, Time: ~1hr
+All the models are saved in `results/model-accuracy.csv`.
+
+## Sequences
 
 ### Data
 
