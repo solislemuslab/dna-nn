@@ -13,11 +13,11 @@ transfer_input_files = environment.yml, cnn_rnn.py, responses.csv, features.jld
 Requirements = (CUDADriverVersion >= 10.0)
 
 # GPU
-request_gpus = 1
+request_gpus = 2
 +WantGPULab = true
 request_cpus = 1
-request_memory = 40GB
-request_disk = 40GB
+request_memory = 50GB
+request_disk = 50GB
 +GPUJobLength = "long" 
 
-queue 3
+queue 10

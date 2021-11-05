@@ -4,9 +4,10 @@ channels:
 dependencies:
   - cudatoolkit
   - python=3.9
-  - numpy
+  - numpy<1.20
   - pandas
-  - tensorflow=2.6
+  - tensorflow>2
+  - tensorflow-gpu
   - h5py
   - keras
   - scikit-learn
