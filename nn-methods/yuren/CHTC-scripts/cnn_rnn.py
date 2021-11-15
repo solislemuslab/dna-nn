@@ -23,6 +23,53 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, Flatten, Input,
 dic_complement = {0: 0, 1: 4, 2: 3, 3: 2, 4: 1}
 
 
+def aug_bootstrap(x_train, y_train):
+    """
+    Augmentation with bootstrap. Randomly shuffle column for multiple
+    times (100 for now) and append to the original matrix. Only
+    augment data where y is 1
+    @param x_train: x for training data
+    @param y_train: y for training data
+    """
+    index_1 = np.argwhere(y_train == 1).flatten().tolist()
+
+    new_x_train_1 = np.transpose(np.copy(np.array(x_train)[index_1]))
+    for i in range(100):
+        np.random.shuffle(new_x_train_1)
+
+    x_train = np.append(x_train, np.transpose(np.array(new_x_train_1)), axis=0)
+    y_train = np.append(y_train, y_train[index_1], axis=0)
+
+    return x_train, y_train
+
+
+def aug_reverse_complement(x_train, y_train, index_1, train_ratio, features):
+    """
+    Augmentation with reverse complement
+    @param x_train: x for training data
+    @param y_train: y for training data
+    @param index_1: index for true in original y
+    @param train_ratio: ratio for training data
+    @param features: original x before one-hot encoding
+    """
+    train_index_1 = index_1[:int(train_ratio * len(index_1))]
+    features_train_1 = features[train_index_1]
+
+    # 1 - A, 2 - C, 3 - G, 4 - T, 0 - missing
+    dic_complement = {0: 0, 1: 4, 2: 3, 3: 2, 4: 1}
+
+    for feature in features_train_1:
+        feature_new = [dic_complement[x] for x in np.flip(feature)]
+        # One hot encoding
+        feature_encode = np.zeros((len(feature_new), 5))
+        feature_encode[range(len(feature_new)), feature_new] = 1
+        # Append to trainig set
+        y_train = np.append(y_train, [1], axis=0)  # class for true
+        x_train = np.append(x_train, [feature_encode], axis=0)
+
+    return x_train, y_train
+
+
 def read_xy(feature_path, response_path):
     """
     Read the input (x) file and label (y) file, parse x and y,
@@ -73,8 +120,7 @@ def read_xy(feature_path, response_path):
     train_index = index_1[:int(train_ratio * len(index_1))] + \
         index_0_shorten[:int(train_ratio * len(index_0_shorten))]
     test_index = index_1[int(train_ratio * len(index_1)):int((train_ratio+test_val_ratio) * len(index_1))] + \
-        index_0[int(train_ratio * len(index_0))
-                    :int((train_ratio+test_val_ratio) * len(index_0))]
+        index_0[int(train_ratio * len(index_0)):int((train_ratio+test_val_ratio) * len(index_0))]
     val_index = index_1[int((train_ratio+test_val_ratio) * len(index_1)):] + \
         index_0[int((train_ratio+test_val_ratio) * len(index_0)):]
 
@@ -86,19 +132,10 @@ def read_xy(feature_path, response_path):
     x_test, y_test = x[test_index], y[test_index]
     x_val, y_val = x[val_index], y[val_index]
 
-    # Augment the train index for true class (class 1) with reverse complement
-    # Add augment function if there for more augmentation methods later
-    train_index_1 = index_1[:int(train_ratio * len(index_1))]
-    features_train_1 = features[train_index_1]
-
-    for feature in features_train_1:
-        feature_new = [dic_complement[x] for x in np.flip(feature)]
-        # One hot encoding
-        feature_encode = np.zeros((len(feature_new), 5))
-        feature_encode[range(len(feature_new)), feature_new] = 1
-        # Append to trainig set
-        y_train += [1]  # class for true
-        x_train += [feature_encode]
+    # Augment the train index for true class (class 1) with reverse complement and bootstrap
+    x_train, y_train = aug_reverse_complement(
+        x_train, y_train, index_1, train_ratio, features)
+    x_train, y_train = aug_bootstrap(x_train, y_train)
 
     return x_train, y_train, x_val, y_val, x_test, y_test, test_index, val_index
 
@@ -204,7 +241,7 @@ if __name__ == "__main__":
     print("y_test", y_test)
     print("y_val", y_val)
     print("Path:", csv_path, model_path)
-    
+
     # Also store the indices and y value to csv file
     with open(csv_path, "a") as f:
         f.write(",".join(map(str, index_test)))
