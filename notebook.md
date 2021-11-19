@@ -21,7 +21,7 @@ We need to concatenate these sequences, but they are not in the same order of ta
 This script takes:
 - `concatenated.fasta`: 122 strains, 483,333 sites
 - `../images/Perron_phenotype-GSU-training.csv` with phenotypes
-- `matchingIDs.csv` copied from `Perron_Collection.xlsx` in the folder `Dropbox⁩/Sharing⁩/personal⁩/ClauDan⁩/work⁩/projects⁩/present⁩/sam-collaboration⁩/pseudomonas⁩/data⁩/CDS-PseudomonasLibrary⁩/Phenotype⁩`, and manually changed some IDs in the csv file to match the fasta file:
+- `matchingIDs.csv` copied from `Perron_Collection.xlsx` in the folder `Dropbox/Sharing/personal/ClauDan/work/projects/present/sam-collaboration/pseudomonas/data/CDS-PseudomonasLibrary/Phenotype`, and manually changed some IDs in the csv file to match the fasta file:
     - SWPA15J=NSWPA15a -> SWPA15J_NSWPA15a
     - CN573=PSE143 -> CN573_PSE143
     - PER11 grande colonie -> PER11
