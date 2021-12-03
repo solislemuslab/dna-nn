@@ -1,0 +1,23 @@
+universe = vanilla
+log = output/cnn_rnn_$(Cluster).log
+error = output/cnn_rnn_$(Cluster)_$(Process).err
+
+executable = cnn_rnn_new.sh
+arguments = $(Process)
+output = output/cnn_rnn_$(Cluster)_$(Process).out
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = environment.yml, cnn_rnn_new.py, concatenated.fasta, alignment_mimic.phy, new_responses_original.csv, matchingIDs.csv 
+
+Requirements = (CUDADriverVersion >= 10.0)
+
+# GPU
+request_gpus = 2
++WantGPULab = true
+request_cpus = 1
+request_memory = 50GB
+request_disk = 50GB
++GPUJobLength = "long" 
+
+queue 5
