@@ -15,4 +15,4 @@ source activate tf-gpu
 # for Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
 export TF_FORCE_GPU_ALLOW_GROWTH='true'
 sudo rm -f ~/.nv 
-python3 cnn_rnn_new.py
+python3 cnn_rnn_test.py

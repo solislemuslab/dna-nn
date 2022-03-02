@@ -2,22 +2,22 @@ universe = vanilla
 log = output/cnn_rnn_$(Cluster).log
 error = output/cnn_rnn_$(Cluster)_$(Process).err
 
-executable = cnn_rnn_new.sh
+executable = cnn_rnn_test.sh
 arguments = $(Process)
 output = output/cnn_rnn_$(Cluster)_$(Process).out
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = environment.yml, cnn_rnn_new.py, concatenated.fasta, alignment_mimic.phy, new_responses_original.csv, matchingIDs.csv 
+transfer_input_files =  environment.yml, cnn_rnn_test.py, concatenated.fasta, alignment_mimic.phy, new_responses_original_bin.csv, matchingIDs.csv, test-model-h5.h5
 
 Requirements = (CUDADriverVersion >= 10.0)
 
 # GPU
-request_gpus = 2
+request_gpus = 1
 +WantGPULab = true
 request_cpus = 1
-request_memory = 50GB
-request_disk = 50GB
-+GPUJobLength = "long" 
+request_memory = 80GB
+request_disk = 80GB
++GPUJobLength = "short" 
 
-queue 5
+queue 1

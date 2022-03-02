@@ -2,22 +2,25 @@ universe = vanilla
 log = output/cnn_rnn_$(Cluster).log
 error = output/cnn_rnn_$(Cluster)_$(Process).err
 
-executable = cnn_rnn.sh
+executable = cnn.sh
 arguments = $(Process)
 output = output/cnn_rnn_$(Cluster)_$(Process).out
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = environment.yml, cnn_rnn.py, responses.csv, features.jld 
+transfer_input_files = environment.yml, cnn.py, concatenated.fasta, alignment_mimic.phy, new_responses_original.csv, matchingIDs.csv 
 
 Requirements = (CUDADriverVersion >= 10.0)
 
 # GPU
-request_gpus = 2
+request_gpus = 1
 +WantGPULab = true
 request_cpus = 1
+
+# 50G is enough for training but require 80G for testing
 request_memory = 50GB
 request_disk = 50GB
+
 +GPUJobLength = "long" 
 
-queue 10
+queue 5
