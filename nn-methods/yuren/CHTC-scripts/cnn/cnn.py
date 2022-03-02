@@ -379,7 +379,7 @@ if __name__ == "__main__":
     y_from_distribution = True
     # the value to seperate more or less susceptible
     response_seperate_val = 0.091
-    batch_size = 4
+    batch_size = 32
 
     # File names
     # new_responses_original.csv for original float results and
