@@ -389,17 +389,17 @@ if __name__ == "__main__":
                     else "new_responses_original_bin.csv"
     id_file = "matchingIDs.csv"
     fasta_files = ["concatenated.fasta"]
-    # each element is phy file name with max lengh of dna id
+    # each element is phy file name with max lengh of dna id.
     phy_files = [["alignment_mimic.phy", 16]]
 
-    # Random str to store the output in case of conflict
+    # Random str to store the output in case of conflict.
     random_str = str(uuid.uuid4())
     LOG_DIR = "./"
     csv_path = LOG_DIR + res_or_class + '-' + random_str + '-csv.csv'
     model_path = LOG_DIR + res_or_class + '-' + random_str + '-h5.h5'
     typeUsed = ["false", "true"]
 
-    # Some meta data about env
+    # Some meta data about environmnet.
     print("numpy version: ", np.__version__)
     print("tensorflow version: ", tf.__version__)
     print("Num GPUs Available: ", len(
@@ -434,7 +434,7 @@ if __name__ == "__main__":
         features = process_xy(x, y, one_hot = False, remove_same = remove_same,
                               split_one_zero = split_one_zero)
 
-    # For encoding dns words, CNN
+    # For encoding dns words, CNN, follow dna-nn-theory github.
     train_gen = gen_from_arrays(x_train, y_train)
     val_gen = gen_from_arrays(x_val, y_val)
     test_gen = gen_from_arrays(x_test, y_test)
@@ -456,7 +456,7 @@ if __name__ == "__main__":
     x_val_encode = np.array(x_val_encode)
     y_val_encode = np.array(y_val_encode)
 
-    # Compile model
+    # Compile model.
     model = None
     keras.backend.clear_session()
     # model = deepram_recurrent_onehot(x_shape)
@@ -484,12 +484,12 @@ if __name__ == "__main__":
         x_val_encode, y_val_encode), callbacks=callbacks, verbose=1,
         batch_size = batch_size)
 
-    # # Fit datasets, not used due to OOM
+    # # Fit datasets, not used due to OOM.
     # history = model.fit(np.array(x_train), np.array(y_train), epochs=500,
     #             validation_data=(np.array(x_val), np.array(y_val)),
     #             callbacks=callbacks, verbose=2, batch_size=4)
 
-    # Print index of test and val for later reproduce on performance stat
+    # Print index of test and val for later reproduce on performance stat.
     print("Index test: ", index_test)
     print("Index val: ", index_val)
     print("y_test:", y_test)
@@ -508,7 +508,7 @@ if __name__ == "__main__":
         f.write("\n" + mark_str)
 
     # Load and evaluate the best model with testing and validation data.
-    # Testing
+    # Testing results
     x_test_encode, y_test_encode = [], []
     for x, y in test_gen():
         x_test_encode.append(x)
@@ -521,11 +521,14 @@ if __name__ == "__main__":
 
     print("test loss, test acc:", results)
     with open(csv_path, "a") as f:
-        f.write("test loss, test acc:" +
-                str(results[0]) + "," + str(results[1]) + '\n')
+        f.write("test loss, test acc:" + str(results) + '\n')
 
-    y_score = model.predict(x_test_encode)
-    y_true = [typeUsed[i] for i in y_test]  # true class
+    y_score = model.predict(x_test_encode) # predicted values
+    # true class or values
+    if res_or_class == "regress":
+        y_true = y_test
+    else:
+        y_true = [typeUsed[i] for i in y_test]
 
     print("test: %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed)),
                                       ", ".join(map(str, results)),
@@ -545,10 +548,14 @@ if __name__ == "__main__":
                                                       for x in y_true])
                                             ))
 
-    # validation
+    # Validation results
     results = model.evaluate(x_val_encode, y_val_encode, verbose=3)
-    y_score = model.predict(x_val_encode)
-    y_true = [typeUsed[i] for i in y_val]  # true class
+    y_score = model.predict(x_val_encode) # predicted values
+    # true class or values
+    if res_or_class == "regress":
+        y_true = y_test
+    else:
+        y_true = [typeUsed[i] for i in y_test]
 
     print("test: %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed)),
                                       ", ".join(map(str, results)),
